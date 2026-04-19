@@ -26,12 +26,9 @@ int main()
     GLuint shader = LoadShaders("./shaders/phong-vs.glsl", "./shaders/phong-fs.glsl");
 
     Uniforms uniforms(shader); Attributes attribs(shader);
-    // Create ground obj
-    Quad ground(uniforms, attribs, "./Textures/crackedmud.png");
-    ground.worldMatrix = Matrix4().makeTranslation(0, -2, 0)*Matrix4().makeRotationX(-90)*Matrix4().makeScale(10, 10, 10)*Matrix4();
 
-    ModelObject head(uniforms, attribs, "./Models/head.obj", "./Textures/lambertian.jpg", GL_RGB);
-    head.worldMatrix = Matrix4()*Matrix4().makeTranslation(0, 0, 0)*Matrix4().makeScale(2, 2, 2);
+    ModelObject earth(uniforms, attribs, "./Models/sphere.obj", "./Textures/Earth.png", GL_RGBA);
+    earth.worldMatrix = Matrix4()*Matrix4().makeTranslation(0, 0, 0)*Matrix4().makeScale(2, 2, 2);
     // Create camera and projection matrix
     Camera camera;
     Matrix4 projectionMatrix;
@@ -68,8 +65,7 @@ int main()
 
         glUniform1f(glGetUniformLocation(shader, "uTime"), glfwGetTime());
         // Render out objects
-        ground.render(camera, projectionMatrix, shader);
-        head.render(camera, projectionMatrix, shader);
+        earth.render(camera, projectionMatrix, shader);
 
         // Render current frame
         glfwSwapBuffers(window);
