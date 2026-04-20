@@ -5,6 +5,7 @@
 #include <shader_vars.hpp>
 #include <math/Matrix4.hpp>
 #include <HelperFuncs.hpp>
+#include <Planet.hpp>
 #include <ModelObject.hpp>
 #include <Quad.hpp>
 #include <Cube.hpp>
@@ -32,43 +33,34 @@ int main()
     // sun.worldMatrix = Matrix4()*Matrix4().makeScale(0.0926667, 0.0926667, 0.0926667);
     sun.worldMatrix = Matrix4()*Matrix4().makeTranslation(0, 0, 0)*Matrix4().makeScale(0.927*10, 0.927*10, 0.927*10);
 
-    ModelObject murcury(uniforms, attribs, "./Models/sphere.obj", "./Textures/Murcury.png", GL_RGBA);
-    murcury.worldMatrix = Matrix4()*Matrix4().makeTranslation(39.93, 0, 0)*Matrix4().makeScale(0.003*100, 0.003*100, 0.003*100);
+    // ModelObject neptune(uniforms, attribs, "./Models/sphere.obj", "./Textures/Neptune.png", GL_RGBA);
+    // neptune.worldMatrix = Matrix4()*Matrix4().makeTranslation(3000-200, 0, 0)*Matrix4().makeScale(0.033*100, 0.033*100, 0.033*100);
 
-    ModelObject venus(uniforms, attribs, "./Models/sphere.obj", "./Textures/Venus.png", GL_RGBA);
-    venus.worldMatrix = Matrix4()*Matrix4().makeTranslation(72, 0, 0)*Matrix4().makeScale(0.008069*100, 0.008069*100, 0.008069*100);
+    Planet murcury(uniforms, attribs, "./Textures/Murcury.png", 0.003*100, 39.93, 10.0/88, 1.0/59, &sun.worldMatrix);
+    Planet venus(uniforms, attribs, "./Textures/Venus.png", 0.00807*100, 72, 10.0/225, 1.0/243, &sun.worldMatrix);
+    Planet earth(uniforms, attribs, "./Textures/Earth.png", 0.0085*100, 100, 10.0/365, 1.0/1, 24, &sun.worldMatrix);
+    Planet moon(uniforms, attribs, "./Textures/Moon.png", 0.0023*100, 2.56, 10.0/27, 1.0/27, &earth.obj.worldMatrix);
+    Planet mars(uniforms, attribs, "./Textures/Mars.png", 0.00452*100, 152, 10.0/686.2, 1.0/1.03, &sun.worldMatrix);
+    Planet jupiter(uniforms, attribs, "./Textures/Jupiter.png", 0.0953*100, 520-200, 10.0/4343.5, 1.0/0.5, &sun.worldMatrix);
+    Planet saturn(uniforms, attribs, "./Textures/Saturn.png", 0.0803*100, 955.33-200, 10.0/10585, 1.0/0.5, &sun.worldMatrix);
+    Quad rings(unlitUniforms, unlitAttribs, "./Textures/Rings.png");
+    Planet uranus(uniforms, attribs, "./Textures/Uranus.png", 0.0341*100, 1913.33-200, 10.0/30660, 1.0/0.75, &sun.worldMatrix);
+    Planet neptune(uniforms, attribs, "./Textures/Neptune.png", 0.033*100, 3000-200, 10.0/90225, 1.0/0.667, &sun.worldMatrix);
 
-    ModelObject earth(uniforms, attribs, "./Models/sphere.obj", "./Textures/Earth.png", GL_RGBA);
-    earth.worldMatrix = Matrix4()*Matrix4().makeTranslation(100, 0, 0)*Matrix4().makeScale(0.0085*100, 0.0085*100, 0.0085*100);
-
-    ModelObject mars(uniforms, attribs, "./Models/sphere.obj", "./Textures/Mars.png", GL_RGBA);
-    mars.worldMatrix = Matrix4()*Matrix4().makeTranslation(152, 0, 0)*Matrix4().makeScale(0.00452*100, 0.00452*100, 0.00452*100);
-
-    ModelObject jupiter(uniforms, attribs, "./Models/sphere.obj", "./Textures/Jupiter.png", GL_RGBA);
-    jupiter.worldMatrix = Matrix4()*Matrix4().makeTranslation(520-200, 0, 0)*Matrix4().makeScale(0.0953*100, 0.0953*100, 0.0953*100);
-
-    ModelObject saturn(uniforms, attribs, "./Models/sphere.obj", "./Textures/Saturn.png", GL_RGBA);
-    saturn.worldMatrix = Matrix4()*Matrix4().makeTranslation(955.333-200, 0, 0)*Matrix4().makeScale(0.0803*100, 0.0803*100, 0.0803*100);
-
-    ModelObject uranus(uniforms, attribs, "./Models/sphere.obj", "./Textures/Uranus.png", GL_RGBA);
-    uranus.worldMatrix = Matrix4()*Matrix4().makeTranslation(1913.333-200, 0, 0)*Matrix4().makeScale(0.0341*100, 0.0341*100, 0.0341*100);
-
-    ModelObject neptune(uniforms, attribs, "./Models/sphere.obj", "./Textures/Neptune.png", GL_RGBA);
-    neptune.worldMatrix = Matrix4()*Matrix4().makeTranslation(3000-200, 0, 0)*Matrix4().makeScale(0.033*100, 0.033*100, 0.033*100);
-
-    std::vector<ModelObject> planets;
-    planets.push_back(murcury);
-    planets.push_back(venus);
-    planets.push_back(earth);
-    planets.push_back(mars);
-    planets.push_back(jupiter);
-    planets.push_back(saturn);
-    planets.push_back(uranus);
-    planets.push_back(neptune);
+    std::vector<Planet*> planets;
+    planets.push_back(&murcury);
+    planets.push_back(&venus);
+    planets.push_back(&earth);
+    planets.push_back(&moon);
+    planets.push_back(&mars);
+    planets.push_back(&jupiter);
+    planets.push_back(&saturn);
+    planets.push_back(&uranus);
+    planets.push_back(&neptune);
 
     // Create camera and projection matrix
     Camera camera;
-    ModelObject cameraTargetPlanet = sun;
+    ModelObject *cameraTargetPlanet = &sun;
     Matrix4 projectionMatrix;
     projectionMatrix.makePerspective(45, 1, 0.1, 100000);
 
@@ -90,13 +82,14 @@ int main()
     // Create vars for mouse x and y position
     double mouseX = 0, mouseY = 0;
     // Main loop
+    double NOW = glfwGetTime();
+    double LAST = 0;
+    double deltaTime;
     while(!glfwWindowShouldClose(window))
     {
-        // Update our camera object
-        camera.update();
-        camera.cameraTarget = cameraTargetPlanet.worldMatrix.getPosition();
-        camera.lookAtTarget = camera.cameraTarget;
-        camera.yawDegrees *= camera.yawDegrees<360;
+        LAST = NOW;
+        NOW = glfwGetTime();
+        deltaTime = (NOW-LAST)*100;
         // Clear the screen
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -107,10 +100,19 @@ int main()
         // Render out objects
         sun.render(camera, projectionMatrix, unlitShader);
 
-        for(ModelObject planet : planets)
+        for(Planet *planet : planets)
         {
-            planet.render(camera, projectionMatrix, shader);
+            planet->render(camera, projectionMatrix, shader);
         }
+        rings.worldMatrix = Matrix4().makeTranslation(saturn.obj.worldMatrix.getPosition())*Matrix4().makeRotationX(-80)*Matrix4().makeScale(15, 15, 15);
+        rings.render(camera, projectionMatrix, unlitShader);
+        // Update our camera object
+        camera.update();
+        camera.cameraTarget = cameraTargetPlanet->worldMatrix.getPosition();
+        camera.lookAtTarget = camera.cameraTarget;
+
+        camera.yawDegrees *= camera.yawDegrees<360;
+
         // Render current frame
         glfwSwapBuffers(window);
         // Poll events
@@ -129,39 +131,43 @@ int main()
         }
         if(glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
         {
-            cameraTargetPlanet = sun;
+            cameraTargetPlanet = &sun;
         }
         else if(glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
         {
-            cameraTargetPlanet = murcury;
+            cameraTargetPlanet = &murcury.obj;
         }
         else if(glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
         {
-            cameraTargetPlanet = venus;
+            cameraTargetPlanet = &venus.obj;
         }
         else if(glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
         {
-            cameraTargetPlanet = earth;
+            cameraTargetPlanet = &earth.obj;
         }
         else if(glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
         {
-            cameraTargetPlanet = mars;
+            cameraTargetPlanet = &mars.obj;
         }
         else if(glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
         {
-            cameraTargetPlanet = jupiter;
+            cameraTargetPlanet = &jupiter.obj;
         }
         else if(glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
         {
-            cameraTargetPlanet = saturn;
+            cameraTargetPlanet = &saturn.obj;
         }
         else if(glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
         {
-            cameraTargetPlanet = uranus;
+            cameraTargetPlanet = &uranus.obj;
         }
         else if(glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS)
         {
-            cameraTargetPlanet = neptune;
+            cameraTargetPlanet = &neptune.obj;
+        }
+        else if(glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+        {
+            cameraTargetPlanet = &moon.obj;
         }
     }
     // Cleanup

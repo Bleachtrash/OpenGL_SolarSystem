@@ -39,7 +39,7 @@ vec3 DirectionLight(vec3 LightDirection)
 
     // todo #9
     // add "diffuseColor" and "specularColor" when ready
-    vec3 finalColor = ambient + diffuse + specular;
+    vec3 finalColor = ambient + diffuse;
 
     return finalColor;
 }
@@ -68,5 +68,5 @@ vec3 PointLight(vec3 lightPosition)
 void main()
 {
 
-    gl_FragColor = vec4(PointLight(uLightPos-vWorldPosition), 1.0);
+    gl_FragColor = vec4(DirectionLight(uLightPos-vWorldPosition), 1.0);
 }

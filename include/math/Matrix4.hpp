@@ -120,6 +120,15 @@ struct Matrix4
 
         return *this;
     }
+    Matrix4 makeTranslation(Vector4 a)
+    {
+        this->makeIdentity();
+        this->elements[3] = a.x;
+        this->elements[7] = a.y;
+        this->elements[11] = a.z;
+
+        return *this;
+    }
     Matrix4 transpose()
     {
         float tmp;

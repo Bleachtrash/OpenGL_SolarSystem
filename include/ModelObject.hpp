@@ -28,6 +28,7 @@ struct ModelObject
     Uniforms uniforms;
     Attributes attribs;
 
+    ModelObject(){}
     ModelObject(Uniforms uniforms, Attributes attribs, char *ModelPath)
     {
         this->texture = 0;
