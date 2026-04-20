@@ -1,4 +1,5 @@
 uniform sampler2D uTexture;
+uniform sampler2D uAmbiantTexture;
 
 varying vec2 vTexCoords;
 varying vec3 vWorldPosition;

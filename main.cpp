@@ -26,19 +26,18 @@ int main()
     // Create shader program with vertex and fragment shaders
     GLuint shader = LoadShaders("./shaders/phong-vs.glsl", "./shaders/phong-fs.glsl");
     GLuint unlitShader = LoadShaders("./shaders/unlit-vs.glsl", "./shaders/unlit-fs.glsl");
-
+    GLuint transparentShader = LoadShaders("./Shaders/transparent-vs.glsl", "./shaders/transparent-fs.glsl");
     Uniforms uniforms(shader); Attributes attribs(shader);
     Uniforms unlitUniforms(unlitShader); Attributes unlitAttribs(unlitShader);
+    Uniforms transUniforms(transparentShader); Attributes transAttribs(transparentShader);
     ModelObject sun(unlitUniforms, unlitAttribs, "./Models/sphere.obj", "./Textures/Sun.png", GL_RGBA);
     // sun.worldMatrix = Matrix4()*Matrix4().makeScale(0.0926667, 0.0926667, 0.0926667);
     sun.worldMatrix = Matrix4()*Matrix4().makeTranslation(0, 0, 0)*Matrix4().makeScale(0.927*10, 0.927*10, 0.927*10);
 
-    // ModelObject neptune(uniforms, attribs, "./Models/sphere.obj", "./Textures/Neptune.png", GL_RGBA);
-    // neptune.worldMatrix = Matrix4()*Matrix4().makeTranslation(3000-200, 0, 0)*Matrix4().makeScale(0.033*100, 0.033*100, 0.033*100);
-
     Planet murcury(uniforms, attribs, "./Textures/Murcury.png", 0.003*100, 39.93, 10.0/88, 1.0/59, &sun.worldMatrix);
     Planet venus(uniforms, attribs, "./Textures/Venus.png", 0.00807*100, 72, 10.0/225, 1.0/243, &sun.worldMatrix);
-    Planet earth(uniforms, attribs, "./Textures/Earth.png", 0.0085*100, 100, 10.0/365, 1.0/1, 24, &sun.worldMatrix);
+    Planet earth(uniforms, attribs, "./Textures/Earth.png", "./Textures/EarthNight.png", 0.0085*100, 100, 10.0/365, 1.0/1, 24, &sun.worldMatrix);
+    Planet earthCloud(transUniforms, transAttribs, "./Textures/EarthCloud.png",  0.0086*100, 0, 10.0/365, 0.9/1, 24, &earth.obj.worldMatrix);
     Planet moon(uniforms, attribs, "./Textures/Moon.png", 0.0023*100, 2.56, 10.0/27, 1.0/27, &earth.obj.worldMatrix);
     Planet mars(uniforms, attribs, "./Textures/Mars.png", 0.00452*100, 152, 10.0/686.2, 1.0/1.03, &sun.worldMatrix);
     Planet jupiter(uniforms, attribs, "./Textures/Jupiter.png", 0.0953*100, 520-200, 10.0/4343.5, 1.0/0.5, &sun.worldMatrix);
@@ -104,6 +103,7 @@ int main()
         {
             planet->render(camera, projectionMatrix, shader);
         }
+        earthCloud.render(camera, projectionMatrix, transparentShader);
         rings.worldMatrix = Matrix4().makeTranslation(saturn.obj.worldMatrix.getPosition())*Matrix4().makeRotationX(-80)*Matrix4().makeScale(15, 15, 15);
         rings.render(camera, projectionMatrix, unlitShader);
         // Update our camera object

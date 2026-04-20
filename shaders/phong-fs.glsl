@@ -1,4 +1,5 @@
 uniform sampler2D uTexture;
+uniform sampler2D uAmbiantTexture;
 uniform vec3 uCameraPosition;
 uniform float uTime;
 uniform vec3 uLightPos;
@@ -33,13 +34,11 @@ vec3 DirectionLight(vec3 LightDirection)
     // todo #8 apply light and material interaction for phong, assume phong material color is (0.3, 0.3, 0.3)
     vec3 specular = vec3(0.3, 0.3, 0.3)*phongTerm;
 
-    vec3 albedo = texture2D(uTexture, vTexCoords).rgb;
-
-    vec3 ambient = albedo * 0.1;
+    vec3 ambient = texture2D(uAmbiantTexture, vTexCoords).xyz*(1-lambert);
 
     // todo #9
     // add "diffuseColor" and "specularColor" when ready
-    vec3 finalColor = ambient + diffuse;
+    vec3 finalColor = ambient+diffuse;
 
     return finalColor;
 }
@@ -58,7 +57,7 @@ vec3 PointLight(vec3 lightPosition)
     phongTerm = clamp(phongTerm, 0.0, 1.0);
     phongTerm = pow(phongTerm, 64.0);
 
-    vec3 ambient = texColor*0.1;
+    vec3 ambient = texColor*0.3;
     vec3 diffuse = texColor*lambert;
     vec3 specular = vec3(0.3, 0.3, 0.3)*phongTerm;
 
