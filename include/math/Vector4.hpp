@@ -33,6 +33,10 @@ struct Vector4
     {
         return Vector4(this->x-other.x, this->y-other.y, this->z-other.z, this->w-other.w);
     }
+    Vector4 operator *(float s)
+    {
+        return Vector4(this->x*s, this->y*s, this->z*s, this->w*s);
+    }
     Vector4 operator /(float s)
     {
         return Vector4(this->x/s, this->y/s, this->z/s, this->w/s);

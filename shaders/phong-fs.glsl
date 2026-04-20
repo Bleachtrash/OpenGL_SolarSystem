@@ -1,6 +1,8 @@
 uniform sampler2D uTexture;
 uniform vec3 uCameraPosition;
 uniform float uTime;
+uniform vec3 uLightPos;
+
 varying vec2 vTexCoords;
 varying vec3 vNormal;
 varying vec3 vWorldPosition;
@@ -66,5 +68,5 @@ vec3 PointLight(vec3 lightPosition)
 void main()
 {
 
-    gl_FragColor = vec4(PointLight(vec3(5, 0, 5)), 1.0);
+    gl_FragColor = vec4(PointLight(uLightPos-vWorldPosition), 1.0);
 }

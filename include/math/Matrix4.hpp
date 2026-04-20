@@ -238,6 +238,10 @@ struct Matrix4
             te[12] * v.x + te[13] * v.y + te[14] * v.z + te[15] * v.w
         );
     }
+    Vector4 getPosition()
+    {
+        return Vector4(this->getElement(0, 3), this->getElement(1, 3), this->getElement(2, 3), this->getElement(3, 3));
+    }
     void log()
     {
         printf("[\n");

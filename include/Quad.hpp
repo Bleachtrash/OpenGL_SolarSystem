@@ -87,6 +87,7 @@ struct Quad
     }
     void render(Camera camera, Matrix4 projectionMatrix, int shader)
     {
+        glUseProgram(shader);
         // Set shader uniforms
         glUniformMatrix4fv(uniforms.worldMatrixUniform, 1, true, this->worldMatrix.elements);
         glUniformMatrix4fv(uniforms.viewMatrixUniform, 1, true, camera.getViewMatrix().elements);
@@ -101,7 +102,6 @@ struct Quad
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBuffer);
 
-        glUseProgram(shader);
         
             glBindBuffer(GL_ARRAY_BUFFER, this->vertexBuffer);
         // Sets the aVertexPosition

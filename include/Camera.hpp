@@ -15,6 +15,7 @@ struct Camera
 {
     Matrix4 cameraWorldMatrix;
     Vector4 cameraTarget;
+    Vector4 lookAtTarget;
     float yawDegrees;
     float pitchDegrees;
     float minDistance;
@@ -32,7 +33,7 @@ struct Camera
         this->pitchDegrees = 0;
         this->minDistance = 1;
         this->maxDistance = 30;
-        this->zoomScale = 1.0;
+        this->zoomScale = 2.0;
     }
     Matrix4 getViewMatrix()
     {
@@ -58,7 +59,7 @@ struct Camera
         transformedTether = yaw*transformedTether;
         
         Vector4 position = cameraTarget+transformedTether;
-        this->lookAt(position, Vector4(0, 0, 0, 1));
+        this->lookAt(position, Vector4(lookAtTarget.x, lookAtTarget.y, lookAtTarget.z, 1));
     }
     Camera lookAt(Vector4 eyePos, Vector4 targetPos)
     {
@@ -79,7 +80,7 @@ struct Camera
     }
     void onMouseDown(double currMouseX, double currMouseY)
     {
-        isDragging = true;;
+        isDragging = true;
         this->lastMouseX = currMouseX;
         this->lastMouseY = currMouseY;
     }
@@ -105,6 +106,6 @@ struct Camera
     void onScroll(double yoffset)
     {
         this->zoomScale -= yoffset/10;
-        this->zoomScale = min(max(this->zoomScale, 0.25), 1);
+        this->zoomScale = max(this->zoomScale, 0);
     }
 };

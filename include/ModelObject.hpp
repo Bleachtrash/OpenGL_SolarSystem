@@ -255,8 +255,10 @@ struct ModelObject
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Set minification filtering to tri-linear
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Set magnification filterint to tri-linear
     }
-    void render(Camera camera, Matrix4 projectionMatrix, int shader)
+    void render(Camera camera, Matrix4 projectionMatrix, GLuint shader)
     {
+        glUseProgram(shader);
+
         // Set shader uniforms
         glUniformMatrix4fv(uniforms.worldMatrixUniform, 1, true, this->worldMatrix.elements);
         glUniformMatrix4fv(uniforms.viewMatrixUniform, 1, true, camera.getViewMatrix().elements);
@@ -266,7 +268,6 @@ struct ModelObject
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, this->texture);
 
-        glUseProgram(shader);
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, this->vertexBuffer);
@@ -304,7 +305,6 @@ struct ModelObject
             (void*)0
         );
         glEnableVertexAttribArray(attribs.vertexNormalAttrib);
-
 
         // Draw the elements
         glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, 0);
