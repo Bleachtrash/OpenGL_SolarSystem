@@ -45,16 +45,16 @@ int main()
     mars.worldMatrix = Matrix4()*Matrix4().makeTranslation(152, 0, 0)*Matrix4().makeScale(0.00452*100, 0.00452*100, 0.00452*100);
 
     ModelObject jupiter(uniforms, attribs, "./Models/sphere.obj", "./Textures/Jupiter.png", GL_RGBA);
-    jupiter.worldMatrix = Matrix4()*Matrix4().makeTranslation(520, 0, 0)*Matrix4().makeScale(0.953*10, 0.953*10, 0.953*10);
+    jupiter.worldMatrix = Matrix4()*Matrix4().makeTranslation(520-200, 0, 0)*Matrix4().makeScale(0.0953*100, 0.0953*100, 0.0953*100);
 
     ModelObject saturn(uniforms, attribs, "./Models/sphere.obj", "./Textures/Saturn.png", GL_RGBA);
-    saturn.worldMatrix = Matrix4()*Matrix4().makeTranslation(955.333, 0, 0)*Matrix4().makeScale(0.0803*100, 0.0803*100, 0.0803*100);
+    saturn.worldMatrix = Matrix4()*Matrix4().makeTranslation(955.333-200, 0, 0)*Matrix4().makeScale(0.0803*100, 0.0803*100, 0.0803*100);
 
     ModelObject uranus(uniforms, attribs, "./Models/sphere.obj", "./Textures/Uranus.png", GL_RGBA);
-    uranus.worldMatrix = Matrix4()*Matrix4().makeTranslation(1913.333, 0, 0)*Matrix4().makeScale(0.0341*100, 0.0341*100, 0.0341*100);
+    uranus.worldMatrix = Matrix4()*Matrix4().makeTranslation(1913.333-200, 0, 0)*Matrix4().makeScale(0.0341*100, 0.0341*100, 0.0341*100);
 
     ModelObject neptune(uniforms, attribs, "./Models/sphere.obj", "./Textures/Neptune.png", GL_RGBA);
-    neptune.worldMatrix = Matrix4()*Matrix4().makeTranslation(3000, 0, 0)*Matrix4().makeScale(0.033*100, 0.033*100, 0.033*100);
+    neptune.worldMatrix = Matrix4()*Matrix4().makeTranslation(3000-200, 0, 0)*Matrix4().makeScale(0.033*100, 0.033*100, 0.033*100);
 
     std::vector<ModelObject> planets;
     planets.push_back(murcury);
