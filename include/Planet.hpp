@@ -18,7 +18,7 @@ struct Planet
 
     Planet(Uniforms uniforms, Attributes attribs, char *texture_file, float diameter, float orbit_dist, float orbit_speed, float rotation_speed, float axis_tilt, Matrix4 *orbit_obj)
     {
-        this->obj = ModelObject(uniforms, attribs, "./Models/sphere.obj", texture_file, GL_RGBA);
+        new(&this->obj) ModelObject(uniforms, attribs, "./Models/sphere.obj", texture_file, GL_RGBA);
         this->diameter = diameter;
         this->orbit_dist = orbit_dist;
         this->orbit_obj = orbit_obj;
@@ -27,10 +27,11 @@ struct Planet
         this->orbit_speed = orbit_speed;
         this->rotation_speed = rotation_speed;
         this->axis_tilt = axis_tilt;
+        this->Update();
     }
     Planet(Uniforms uniforms, Attributes attribs, char *texture_file, char *ambiant_texture_file, float diameter, float orbit_dist, float orbit_speed, float rotation_speed, float axis_tilt, Matrix4 *orbit_obj)
     {
-        this->obj = ModelObject(uniforms, attribs, "./Models/sphere.obj", texture_file, ambiant_texture_file, GL_RGBA);
+        new(&this->obj) ModelObject(uniforms, attribs, "./Models/sphere.obj", texture_file, ambiant_texture_file, GL_RGBA);
         this->diameter = diameter;
         this->orbit_dist = orbit_dist;
         this->orbit_obj = orbit_obj;

@@ -43,5 +43,6 @@ struct Attributes
         this->vertexPositionAttrib = glGetAttribLocation(shader_program, "aVertexPosition");
         this->vertexNormalAttrib = glGetAttribLocation(shader_program, "aVertexNormal");
         this->texCoordsAttrib = glGetAttribLocation(shader_program, "aTexCoords");
+        
     }
 };

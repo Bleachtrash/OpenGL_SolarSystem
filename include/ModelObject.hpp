@@ -29,6 +29,15 @@ struct ModelObject
     Uniforms uniforms;
     Attributes attribs;
 
+    ~ModelObject()
+    {
+        glDeleteBuffers(1, &vertexBuffer);
+        glDeleteBuffers(1, &indexBuffer);
+        glDeleteBuffers(1, &texCoordBuffer);
+        glDeleteBuffers(1, &normalBuffer);
+        glDeleteTextures(1, &texture);
+        glDeleteTextures(1, &ambiantTexture);
+    }
     ModelObject(){}
     ModelObject(Uniforms uniforms, Attributes attribs, char *ModelPath)
     {
@@ -234,6 +243,9 @@ struct ModelObject
         glGenBuffers(1, &normalBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*num_indices*3, normals, GL_STATIC_DRAW);
+
+        delete texCoordsTemp;
+        delete vertexNormalTemp;
     }
     ModelObject(Uniforms uniforms, Attributes attribs, char* model_path, char* texture_file, GLenum format) : ModelObject(uniforms, attribs, model_path)
     {
@@ -343,10 +355,15 @@ struct ModelObject
         glDisableVertexAttribArray(attribs.vertexPositionAttrib);
         glDisableVertexAttribArray(attribs.texCoordsAttrib);
         glDisableVertexAttribArray(attribs.vertexNormalAttrib);
-        
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, 0);
+        
+        glUseProgram(0);
     }
 };

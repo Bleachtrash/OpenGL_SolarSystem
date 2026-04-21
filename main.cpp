@@ -33,7 +33,7 @@ int main()
     ModelObject sun(unlitUniforms, unlitAttribs, "./Models/sphere.obj", "./Textures/Sun.png", GL_RGBA);
     // sun.worldMatrix = Matrix4()*Matrix4().makeScale(0.0926667, 0.0926667, 0.0926667);
     sun.worldMatrix = Matrix4()*Matrix4().makeTranslation(0, 0, 0)*Matrix4().makeScale(0.927*10, 0.927*10, 0.927*10);
-
+    // printf("Sun\n");
     Planet murcury(uniforms, attribs, "./Textures/Murcury.png", 0.003*100, 39.93, 10.0/88, 1.0/59, &sun.worldMatrix);
     Planet venus(uniforms, attribs, "./Textures/Venus.png", 0.00807*100, 72, 10.0/225, 1.0/243, &sun.worldMatrix);
     Planet earth(uniforms, attribs, "./Textures/Earth.png", "./Textures/EarthNight.png", 0.0085*100, 100, 10.0/365, 1.0/1, 24, &sun.worldMatrix);
@@ -99,24 +99,26 @@ int main()
         // Render out objects
         sun.render(camera, projectionMatrix, unlitShader);
 
-        for(Planet *planet : planets)
+        for(int i = 0; i < planets.size(); i++)
         {
-            planet->render(camera, projectionMatrix, shader);
+            planets[i]->render(camera, projectionMatrix, shader);
         }
         earthCloud.render(camera, projectionMatrix, transparentShader);
         rings.worldMatrix = Matrix4().makeTranslation(saturn.obj.worldMatrix.getPosition())*Matrix4().makeRotationX(-80)*Matrix4().makeScale(15, 15, 15);
         rings.render(camera, projectionMatrix, unlitShader);
-        // Update our camera object
+        // // Update our camera object
         camera.update();
         camera.cameraTarget = cameraTargetPlanet->worldMatrix.getPosition();
         camera.lookAtTarget = camera.cameraTarget;
 
-        camera.yawDegrees *= camera.yawDegrees<360;
+        // camera.yawDegrees *= camera.yawDegrees<360;
 
         // Render current frame
         glfwSwapBuffers(window);
+        
         // Poll events
         glfwPollEvents();
+
         // Set mouse x and y variables
         glfwGetCursorPos(window, &mouseX, &mouseY);
         // Check if left mouse button was pressed
@@ -171,6 +173,9 @@ int main()
         }
     }
     // Cleanup
+    glDeleteShader(shader);
+    glDeleteShader(unlitShader);
+    glDeleteShader(transparentShader);
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;

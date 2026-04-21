@@ -14,7 +14,7 @@ struct Matrix4
 
     ~Matrix4()
     {
-        elements = nullptr;
+        // delete elements;
     }
     Matrix4()
     {
