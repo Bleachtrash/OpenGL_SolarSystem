@@ -24,10 +24,21 @@ struct ModelObject
     Matrix4 worldMatrix;
     GLuint normalBuffer;
     GLuint texture;
+    GLuint ambiantTexture;
 
     Uniforms uniforms;
     Attributes attribs;
 
+    ~ModelObject()
+    {
+        glDeleteBuffers(1, &vertexBuffer);
+        glDeleteBuffers(1, &indexBuffer);
+        glDeleteBuffers(1, &texCoordBuffer);
+        glDeleteBuffers(1, &normalBuffer);
+        glDeleteTextures(1, &texture);
+        glDeleteTextures(1, &ambiantTexture);
+    }
+    ModelObject(){}
     ModelObject(Uniforms uniforms, Attributes attribs, char *ModelPath)
     {
         this->texture = 0;
@@ -232,13 +243,17 @@ struct ModelObject
         glGenBuffers(1, &normalBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*num_indices*3, normals, GL_STATIC_DRAW);
+
+        delete texCoordsTemp;
+        delete vertexNormalTemp;
     }
     ModelObject(Uniforms uniforms, Attributes attribs, char* model_path, char* texture_file, GLenum format) : ModelObject(uniforms, attribs, model_path)
     {
+        glActiveTexture(GL_TEXTURE0);
         // Create and bind the texture buffer
         glGenTextures(1, &this->texture);
         glBindTexture(GL_TEXTURE_2D, this->texture);
-
+        this->ambiantTexture = 0;
         // Get the image data using stb_image.h
         int width, height, nrChannels;
         unsigned char *data = stbi_load(texture_file, &width, &height, &nrChannels, 0);
@@ -255,18 +270,47 @@ struct ModelObject
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Set minification filtering to tri-linear
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Set magnification filterint to tri-linear
     }
-    void render(Camera camera, Matrix4 projectionMatrix, int shader)
+    ModelObject(Uniforms uniforms, Attributes attribs, char* model_path, char* texture_file, char*ambiant_texture_file, GLenum format) : ModelObject(uniforms, attribs, model_path, texture_file, format)
     {
+        glActiveTexture(GL_TEXTURE1);
+        // Create and bind the texture buffer
+        glGenTextures(1, &this->ambiantTexture);
+        glBindTexture(GL_TEXTURE_2D, this->ambiantTexture);
+
+        // Get the image data using stb_image.h
+        int width, height, nrChannels;
+        unsigned char *data = stbi_load(ambiant_texture_file, &width, &height, &nrChannels, 0);
+        if(!data)
+            printf("IMAGE FAILED TO LOAD!!\n");
+        // Send the image data to GL_TEXTURE_2D
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        stbi_image_free(data);
+        // Set texture filtering method
+        glGenerateMipmap(GL_TEXTURE_2D);    // Generate image mipmap
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Set minification filtering to tri-linear
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Set magnification filterint to tri-linear
+    }
+    void render(Camera camera, Matrix4 projectionMatrix, GLuint shader)
+    {
+        glUseProgram(shader);
+
         // Set shader uniforms
         glUniformMatrix4fv(uniforms.worldMatrixUniform, 1, true, this->worldMatrix.elements);
         glUniformMatrix4fv(uniforms.viewMatrixUniform, 1, true, camera.getViewMatrix().elements);
         glUniformMatrix4fv(uniforms.projectionMatrixUniform, 1, true, projectionMatrix.elements);
         glUniform3f(uniforms.cameraPositionUniform, camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
+        
+        glUniform1i(glGetUniformLocation(shader, "uTexture"), 0);
+        glUniform1i(glGetUniformLocation(shader, "uAmbiantTexture"), 1);
         // Activate and bind texture
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, this->texture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, this->ambiantTexture);
 
-        glUseProgram(shader);
         
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, this->vertexBuffer);
@@ -305,14 +349,21 @@ struct ModelObject
         );
         glEnableVertexAttribArray(attribs.vertexNormalAttrib);
 
-
         // Draw the elements
         glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, 0);
 
         glDisableVertexAttribArray(attribs.vertexPositionAttrib);
         glDisableVertexAttribArray(attribs.texCoordsAttrib);
         glDisableVertexAttribArray(attribs.vertexNormalAttrib);
-        
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        
+        glUseProgram(0);
     }
 };

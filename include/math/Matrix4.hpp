@@ -14,7 +14,7 @@ struct Matrix4
 
     ~Matrix4()
     {
-        elements = nullptr;
+        // delete elements;
     }
     Matrix4()
     {
@@ -112,6 +112,15 @@ struct Matrix4
         return *this;
     }
     Matrix4 makeTranslation(Vector3 a)
+    {
+        this->makeIdentity();
+        this->elements[3] = a.x;
+        this->elements[7] = a.y;
+        this->elements[11] = a.z;
+
+        return *this;
+    }
+    Matrix4 makeTranslation(Vector4 a)
     {
         this->makeIdentity();
         this->elements[3] = a.x;
@@ -237,6 +246,10 @@ struct Matrix4
             te[8] * v.x + te[9] * v.y + te[10] * v.z + te[11] * v.w,
             te[12] * v.x + te[13] * v.y + te[14] * v.z + te[15] * v.w
         );
+    }
+    Vector4 getPosition()
+    {
+        return Vector4(this->getElement(0, 3), this->getElement(1, 3), this->getElement(2, 3), this->getElement(3, 3));
     }
     void log()
     {
